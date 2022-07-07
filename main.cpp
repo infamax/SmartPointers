@@ -1,18 +1,31 @@
 #include <iostream>
 #include <memory>
-#include <vector>
+#include "unique.h"
+#include "my_int.h"
 
-#include "test_runner.h"
-#include "UniquePtrs/test_unique.h"
 
+struct Foo {
+    Foo(int _val) : val(_val) { std::cout << "Foo...\n"; }
+    ~Foo() { std::cout << "~Foo...\n"; }
+    int val;
+};
 
 int main() {
-    TestRunner tr;
-    RUN_TEST(tr, TestLifeTime);
-    TestNoCopy();
-    //RUN_TEST(tr, TestBasic);
-    //RUN_TEST(tr, TestMoveSemantics);
-    TestMoveSemantics();
-    TestSwap();
+    UniquePtr<MyInt> s(new MyInt);
+
+    if (MyInt::AliveCount() == 1) {
+        std::cout << "Ok1\n";
+    }
+
+    s = nullptr;
+
+    if (MyInt::AliveCount() == 0) {
+        std::cout << "Ok2\n";
+    }
+
+    if (s.Get() == nullptr) {
+        std::cout << "Ok3\n";
+    }
+
     return 0;
 }

@@ -11,7 +11,6 @@ public:
     }
 
     MyInt(int value) : value_(value) {
-
         ++count_alive;
     };
 
@@ -39,6 +38,6 @@ public:
 
 private:
     int value_;
-
     inline static int count_alive = 0;
 };
+
