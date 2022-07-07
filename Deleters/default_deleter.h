@@ -13,7 +13,7 @@ struct DefaultDeleter {
 template<typename T>
 struct DefaultDeleter <T[]> {
     void operator()(T* ptr) noexcept {
-        delete ptr;
+        delete[] ptr;
     }
 };
 

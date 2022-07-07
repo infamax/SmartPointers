@@ -106,6 +106,7 @@ private:
 // Function make_unique specialisation for not array
 template <typename T, typename... Args>
 UniquePtr<T> MakeUnique(Args&& args);
+ */
 
 
 
@@ -115,23 +116,71 @@ template<typename T,
         typename Deleter>
 class UniquePtr <T[], Deleter> {
 public:
-    T& operator[] (size_t index) const;
+    UniquePtr() = default;
+    explicit UniquePtr(T* ptr) {
+        ptr_ = ptr;
+        ptr = nullptr;
+    }
 
-    // operators =
-    UniquePtr& operator=(const UniquePtr& other) = delete;
-    UniquePtr& operator=(UniquePtr&& other) noexcept;
-    UniquePtr& operator=(std::nullptr_t);
+    UniquePtr(const UniquePtr& other) = delete;
 
-    // modifies
-    T* Get() const noexcept;
-    T* Release() noexcept;
-    void Reset(T* ptr) noexcept;
-    void Swap(UniquePtr& other);
+    UniquePtr(UniquePtr&& other) noexcept {
+        ptr_ = other.ptr_;
+        deleter_ = other.deleter_;
+        other.ptr_ = nullptr;
+    }
+
+
+    UniquePtr& operator=(UniquePtr&& other) noexcept {
+        if (this == &other) {
+            return *this;
+        }
+        delete ptr_;
+        ptr_ = other.ptr_;
+        deleter_ = other.deleter_;
+        other.ptr_ = nullptr;
+        return *this;
+    }
+
+    UniquePtr& operator=(std::nullptr_t) {
+        if (ptr_) {
+            deleter_(ptr_);
+        }
+        ptr_ = nullptr;
+        return *this;
+    }
+
+    T* Release() noexcept {
+        T* tmp = ptr_;
+        ptr_ = nullptr;
+        return tmp;
+    }
+
+    void Reset(T* ptr = nullptr) noexcept {
+        T* old_ptr = ptr_;
+        ptr_ = ptr;
+        if (old_ptr) {
+            deleter_(old_ptr);
+        }
+    }
+
+    void Swap(UniquePtr& other) {
+        T* tmp = other.ptr_;
+        other.ptr_ = ptr_;
+        ptr_ = tmp;
+    }
+
+    T& operator[] (size_t index) const {
+        return ptr_[index];
+    }
+
 
     // Destructor
-    ~UniquePtr();
+    ~UniquePtr() {
+        delete[] ptr_;
+    }
 private:
     T* ptr_ = nullptr;
     Deleter deleter_;
 };
- */
+
