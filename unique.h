@@ -102,11 +102,13 @@ private:
     Deleter deleter_;
 };
 
-/*
+
 // Function make_unique specialisation for not array
 template <typename T, typename... Args>
-UniquePtr<T> MakeUnique(Args&& args);
- */
+UniquePtr<T> MakeUnique(Args&&... args) {
+    return UniquePtr<T>(new T(std::forward<Args>(args)...));
+}
+
 
 
 
@@ -160,7 +162,6 @@ public:
         T* old_ptr = ptr_;
         ptr_ = ptr;
         if (old_ptr) {
-            deleter_(old_ptr);
         }
     }
 
